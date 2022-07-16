@@ -8,7 +8,8 @@ const connectData = require('./src/config/database')
 const routes = require('./src/routes')
 
 // middleware
-dotenv.config()
+dotenv.config().parsed
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(morgan('common'))
@@ -22,4 +23,4 @@ connectData()
 app.use('/api', routes)
 
 const port = process.env.PORT || 5500
-app.listen(port, () => console.log(`Server is running ${port}`))
+app.listen(port, () => console.log(`Server is running port ${port}`))

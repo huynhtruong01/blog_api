@@ -41,9 +41,7 @@ const StoryController = {
 
             const data = stories[0].data
             const count = stories[0].count
-            const totalCount = Math.ceil(count / limit)
-
-            // console.log(count)
+            const totalCount = Math.ceil(count / limit) || 0
 
             res.status(200).json({ data, totalCount })
         } catch (error) {
@@ -131,12 +129,9 @@ const StoryController = {
                     },
                 },
                 { $count: 'count' },
-                { $sort: { createdAt: -1 } },
-                { $limit: limit },
-                { $skip: skip },
             ])
 
-            const totalCount = count[0]?.['count'] || 0
+            const totalCount = Math.ceil(count[0]?.['count'] / limit) || 0
 
             // console.log(data, totalCount)
 
