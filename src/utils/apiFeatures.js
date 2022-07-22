@@ -58,6 +58,12 @@ function ApiFeatures(query, queryString) {
 
         return this
     }
+
+    // count
+    this.count = () => {
+        this.query = this.query.count()
+        return this
+    }
 }
 
 module.exports = ApiFeatures

@@ -1,3 +1,4 @@
+const Blog = require('../models/blogModel')
 const Category = require('../models/categoryModel')
 const pagination = require('../utils/pagination')
 
@@ -106,6 +107,13 @@ const CategoryController = {
     // delete category
     deleteCategory: async (req, res) => {
         try {
+            const blogList = await Blog.find({ category: req.params.id })
+            if (blogList.length > 0) {
+                return res.status(400).json({
+                    message: "Can't delete this blog list. Please delete blog has this category",
+                })
+            }
+
             const category = await Category.findById({ _id: req.params.id })
             if (!category) {
                 return res.status(404).json({ message: 'Not found this category' })

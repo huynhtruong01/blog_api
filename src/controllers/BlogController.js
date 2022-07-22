@@ -370,6 +370,8 @@ const BlogController = {
     },
     // get all save blog
     getAllSavedBlog: async (req, res) => {
+        const { limit } = pagination(req.query)
+
         try {
             // check user exits?
             const user = await User.findById({ _id: req.query.id })
@@ -377,10 +379,15 @@ const BlogController = {
                 return res.status(404).json({ message: 'Không tìm thấy người dùng này' })
             }
 
-            // console.log(user)
-
             // get save blog by user
-            const features = new ApiFeatures(Blog.find({ _id: { $in: user.savedBlog } }), req.query)
+            const features = new ApiFeatures(
+                Blog.find({ _id: { $in: user.savedBlog } }, { content: 0 })
+                    .populate({
+                        path: 'user',
+                    })
+                    .populate('category'),
+                req.query
+            )
                 .pagination()
                 .sort()
                 .search()
@@ -391,28 +398,35 @@ const BlogController = {
                 Blog.countDocuments(features.queryString),
             ])
 
+            let totalCount = 0
             const data = blogList[0].status === 'fulfilled' ? blogList[0].value : []
-            // if (req.query.search) {
-            //     const count = await Blog.aggregate([
-            //         {
-            //             $match: {
-            //                 _id: { $in: user.savedBlog },
-            //             },
-            //         },
-            //     ])
-            // }
-
-            const count = await Blog.aggregate([
-                {
-                    $match: {
-                        _id: { $in: user.savedBlog },
+            if (req.query.search) {
+                const count = await Blog.aggregate([
+                    {
+                        $match: {
+                            _id: { $in: user.savedBlog },
+                            title: req.query.search,
+                        },
                     },
-                },
-            ])
+                    {
+                        $sort: { createdAt: -1 },
+                    },
+                    {
+                        $count: 'count',
+                    },
+                    {
+                        $project: {
+                            count: 1,
+                        },
+                    },
+                ])
 
-            console.log(count)
+                totalCount = Math.ceil(count[0]?.count / limit) || 0
+            } else {
+                totalCount = blogList[1].status === 'fulfilled' ? blogList[1].value : 0
+            }
 
-            // const blogList = user.savedBlog
+            res.status(200).json({ data, totalCount })
         } catch (error) {
             res.status(500).json({
                 error: error.message,

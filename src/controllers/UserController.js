@@ -174,11 +174,404 @@ const UserController = {
             await User.findByIdAndDelete({ _id: req.params.id })
 
             // delete blog by userId
-            await Blog.deleteMany({ _id: req.params.id })
+            await Blog.deleteMany({ user: req.params.id })
+
+            // find all user following by this user and delete this user
+            const userList = await User.find()
+            const newUserFollowingList = userList
+                .filter((x) => {
+                    for (const follow of x.following) {
+                        if (follow == req.params.id) return true
+                    }
+
+                    return false
+                })
+                .map((x) => x._id)
+            if (newUserFollowingList.length > 0) {
+                await User.updateMany(
+                    { _id: { $in: newUserFollowingList } },
+                    {
+                        $pull: {
+                            following: req.params.id,
+                        },
+                    },
+                    {
+                        new: true,
+                    }
+                )
+            }
+
+            // find all user followers by this user and delete this user
+            const newUserFollowerList = userList
+                .filter((x) => {
+                    for (const follow of x.followers) {
+                        if (follow == req.params.id) return true
+                    }
+
+                    return false
+                })
+                .map((x) => x._id)
+            if (newUserFollowerList.length > 0) {
+                await User.updateMany(
+                    { _id: { $in: newUserFollowerList } },
+                    {
+                        $pull: {
+                            followers: req.params.id,
+                        },
+                    },
+                    {
+                        new: true,
+                    }
+                )
+            }
 
             res.status(200).json({ message: 'Delete user successfully' })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Delete user failed' })
+        }
+    },
+    // follow
+    followUser: async (req, res) => {
+        try {
+            // check user self
+            const selfUser = await User.findById({ _id: req.body.id })
+            if (!selfUser) {
+                return res.status(404).json({
+                    message: 'Không tìm thấy tài khoản của bạn để theo dõi người dùng này',
+                })
+            }
+
+            // check other user
+            const otherUser = await User.findById({ _id: req.body.userId })
+            if (!otherUser) {
+                return res.status(404).json({ message: 'Không tìm thấy người dùng này' })
+            }
+
+            // push to following other user
+            await User.findByIdAndUpdate(
+                { _id: req.body.id },
+                {
+                    $push: {
+                        following: req.body.userId,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+
+            // other user push userId to followers
+            await User.findByIdAndUpdate(
+                { _id: req.body.userId },
+                {
+                    $push: {
+                        followers: req.body.id,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+
+            res.status(200).json({ message: 'Đã theo dõi' })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                message: 'Đã xảy ra lỗi khi theo dõi người dùng khác',
+            })
+        }
+    },
+    // unfollow
+    unfollowUser: async (req, res) => {
+        try {
+            // check user self
+            const selfUser = await User.findById({ _id: req.body.id })
+            if (!selfUser) {
+                return res.status(404).json({
+                    message: 'Không tìm thấy tài khoản của bạn để theo dõi người dùng này',
+                })
+            }
+
+            // check other user
+            const otherUser = await User.findById({ _id: req.body.userId })
+            if (!otherUser) {
+                return res.status(404).json({ message: 'Không tìm thấy người dùng này' })
+            }
+
+            // pull to following other user
+            await User.findByIdAndUpdate(
+                { _id: req.body.id },
+                {
+                    $pull: {
+                        following: req.body.userId,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+
+            // other user pull userId to followers
+            await User.findByIdAndUpdate(
+                { _id: req.body.userId },
+                {
+                    $pull: {
+                        followers: req.body.id,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+
+            res.status(200).json({ message: 'Đã hủy theo dõi' })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                message: 'Đã xảy ra lỗi khi hủy theo dõi người dùng này',
+            })
+        }
+    },
+    // get all follower
+    getAllFollower: async (req, res) => {
+        const { limit, skip } = pagination(req.query)
+
+        try {
+            const user = await User.findById({ _id: req.params.id })
+            if (!user) {
+                return res.status(404).json({ message: 'Không tìm thấy tài khoản của bạn' })
+            }
+
+            const followerList = await User.aggregate([
+                {
+                    $facet: {
+                        data: [
+                            {
+                                $match: {
+                                    _id: user._id,
+                                },
+                            },
+                            {
+                                $lookup: {
+                                    from: 'users',
+                                    localField: 'followers',
+                                    foreignField: '_id',
+                                    pipeline: [
+                                        {
+                                            $project: {
+                                                password: 0,
+                                                email: 0,
+                                            },
+                                        },
+                                    ],
+                                    as: 'followers',
+                                },
+                            },
+                            {
+                                $unwind: '$followers',
+                            },
+                            {
+                                $project: {
+                                    _id: '$followers._id',
+                                    fullname: '$followers.fullname',
+                                    username: '$followers.username',
+                                    detail: '$followers.detail',
+                                    website: '$followers.website',
+                                    avatar: '$followers.avatar',
+                                },
+                            },
+
+                            {
+                                $limit: limit,
+                            },
+                            {
+                                $skip: skip,
+                            },
+                        ],
+                        count: [
+                            {
+                                $match: {
+                                    _id: user._id,
+                                },
+                            },
+                            {
+                                $lookup: {
+                                    from: 'users',
+                                    localField: 'followers',
+                                    foreignField: '_id',
+                                    pipeline: [
+                                        {
+                                            $project: {
+                                                password: 0,
+                                                email: 0,
+                                            },
+                                        },
+                                    ],
+                                    as: 'followers',
+                                },
+                            },
+                            {
+                                $unwind: '$followers',
+                            },
+                            {
+                                $project: {
+                                    _id: '$followers._id',
+                                    fullname: '$followers.fullname',
+                                    username: '$followers.username',
+                                    detail: '$followers.detail',
+                                    website: '$followers.website',
+                                    avatar: '$followers.avatar',
+                                },
+                            },
+                            {
+                                $count: 'count',
+                            },
+                        ],
+                    },
+                },
+                {
+                    $unwind: '$count',
+                },
+            ])
+
+            let data = []
+            let totalCount = 0
+            // search
+            if (req.query.name) {
+                data = followerList[0]?.data.filter((x) => x.username.includes(req.query.name))
+                totalCount = Math.ceil(data.length / limit) || 0
+            } else {
+                data = followerList[0]?.data
+                totalCount = Math.ceil(followerList[0]?.count.count / limit) || 0
+            }
+
+            res.json({ data, totalCount })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                message: 'Đã xảy ra lỗi khi lấy tất cả người dùng theo dõi',
+            })
+        }
+    },
+    // get all following
+    getAllFollowing: async (req, res) => {
+        const { limit, skip } = pagination(req.query)
+
+        try {
+            const user = await User.findById({ _id: req.params.id })
+            if (!user) {
+                return res.status(404).json({ message: 'Không tìm thấy tài khoản của bạn' })
+            }
+
+            const followingList = await User.aggregate([
+                {
+                    $facet: {
+                        data: [
+                            {
+                                $match: {
+                                    _id: user._id,
+                                },
+                            },
+                            {
+                                $lookup: {
+                                    from: 'users',
+                                    localField: 'following',
+                                    foreignField: '_id',
+                                    pipeline: [
+                                        {
+                                            $project: {
+                                                password: 0,
+                                                email: 0,
+                                            },
+                                        },
+                                    ],
+                                    as: 'following',
+                                },
+                            },
+                            {
+                                $unwind: '$following',
+                            },
+                            {
+                                $project: {
+                                    _id: '$following._id',
+                                    fullname: '$following.fullname',
+                                    username: '$following.username',
+                                    detail: '$following.detail',
+                                    website: '$following.website',
+                                    avatar: '$following.avatar',
+                                },
+                            },
+
+                            {
+                                $limit: limit,
+                            },
+                            {
+                                $skip: skip,
+                            },
+                        ],
+                        count: [
+                            {
+                                $match: {
+                                    _id: user._id,
+                                },
+                            },
+                            {
+                                $lookup: {
+                                    from: 'users',
+                                    localField: 'following',
+                                    foreignField: '_id',
+                                    pipeline: [
+                                        {
+                                            $project: {
+                                                password: 0,
+                                                email: 0,
+                                            },
+                                        },
+                                    ],
+                                    as: 'following',
+                                },
+                            },
+                            {
+                                $unwind: '$following',
+                            },
+                            {
+                                $project: {
+                                    _id: '$following._id',
+                                    fullname: '$following.fullname',
+                                    username: '$following.username',
+                                    detail: '$following.detail',
+                                    website: '$following.website',
+                                    avatar: '$following.avatar',
+                                },
+                            },
+                            {
+                                $count: 'count',
+                            },
+                        ],
+                    },
+                },
+                {
+                    $unwind: '$count',
+                },
+            ])
+
+            let data = []
+            let totalCount = 0
+            // search
+            if (req.query.name) {
+                data = followingList[0]?.data.filter((x) => x.username.includes(req.query.name))
+                totalCount = Math.ceil(data.length / limit) || 0
+            } else {
+                data = followingList[0]?.data
+                totalCount = Math.ceil(followingList[0]?.count.count / limit) || 0
+            }
+
+            res.json({ data, totalCount })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                message: 'Đã xảy ra lỗi khi lấy tất cả người dùng theo dõi',
+            })
         }
     },
 }

@@ -56,11 +56,13 @@ const story = new mongoose.Schema(
             required: true,
             minLength: 500,
         },
-        urlSocial: {
-            type: String,
-            trim: true,
-            default: 'https://www.instagram.com/truong_01h/',
-        },
+        urlSocial: [
+            {
+                type: String,
+                trim: true,
+                default: 'https://www.instagram.com/truong_01h/',
+            },
+        ],
     },
     {
         timestamps: true,

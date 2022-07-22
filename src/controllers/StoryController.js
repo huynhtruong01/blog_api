@@ -133,10 +133,11 @@ const StoryController = {
 
             const totalCount = Math.ceil(count[0]?.['count'] / limit) || 0
 
-            // console.log(data, totalCount)
+            console.log(data, totalCount)
 
             res.status(200).json({ data, totalCount })
         } catch (error) {
+            console.log(error.message)
             res.status(500).json({ error: error.message, message: 'Search name story failed' })
         }
     },

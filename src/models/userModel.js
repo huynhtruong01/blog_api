@@ -49,7 +49,7 @@ const user = new mongoose.Schema(
                 ref: 'Blog',
             },
         ],
-        follows: [
+        followers: [
             {
                 type: mongoose.Types.ObjectId,
                 ref: 'User',
@@ -67,8 +67,8 @@ const user = new mongoose.Schema(
     }
 )
 
-user.index({ fullname: 'text' })
+user.index({ username: 'text' })
 const User = mongoose.model('User', user)
-User.createIndexes({ fullname: 'text' })
+User.createIndexes({ username: 'text' })
 
 module.exports = User
