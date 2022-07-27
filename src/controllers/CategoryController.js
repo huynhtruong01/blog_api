@@ -6,6 +6,7 @@ const CategoryController = {
     // add category
     addCategory: async (req, res) => {
         try {
+            console.log(req.body)
             const category = await Category.findOne({ name: req.body.name })
             if (category) {
                 return res.status(400).json({ message: 'This category already exits' })
@@ -74,7 +75,7 @@ const CategoryController = {
                 return res.status(404).json({ message: 'Not found this category' })
             }
 
-            res.status(200).json({ category })
+            res.status(200).json({ data: category })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Get by id category failed' })
         }

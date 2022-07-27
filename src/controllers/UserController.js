@@ -21,7 +21,7 @@ const UserController = {
 
             await user.save()
 
-            res.status(200).json({ user, message: 'Add user successfully' })
+            res.status(200).json({ user, message: 'Create user successfully' })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Add user failed' })
         }
@@ -47,6 +47,18 @@ const UserController = {
                                     pipeline: [{ $project: { content: 0 } }],
                                     as: 'savedBlog',
                                 },
+                            },
+                            {
+                                $lookup: {
+                                    from: 'roles',
+                                    localField: 'role',
+                                    foreignField: '_id',
+                                    pipeline: [{ $project: { userList: 0 } }],
+                                    as: 'role',
+                                },
+                            },
+                            {
+                                $unwind: '$role',
                             },
                         ],
                         count: [
@@ -77,12 +89,12 @@ const UserController = {
     // get by id
     getByIdUser: async (req, res) => {
         try {
-            const user = await User.findById({ _id: req.params.id })
+            const user = await User.findById({ _id: req.params.id }).select('-password')
             if (!user) {
                 return res.status(404).json({ message: 'Not found this user' })
             }
 
-            res.status(200).json({ user })
+            res.status(200).json({ data: user })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Get by id user failed' })
         }
@@ -102,6 +114,18 @@ const UserController = {
                 { $limit: limit },
                 { $skip: skip },
                 { $sort: { createdAt: -1 } },
+                {
+                    $lookup: {
+                        from: 'roles',
+                        localField: 'role',
+                        foreignField: '_id',
+                        pipeline: [{ $project: { userList: 0 } }],
+                        as: 'role',
+                    },
+                },
+                {
+                    $unwind: '$role',
+                },
                 {
                     $project: {
                         rf_token: 0,

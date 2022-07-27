@@ -38,9 +38,9 @@ const user = new mongoose.Schema(
             trim: true,
         },
         role: {
-            type: String,
-            default: 'user',
-            lowercase: true,
+            type: mongoose.Types.ObjectId,
+            ref: 'Role',
+            required: true,
         },
         rf_token: { type: String, select: false },
         savedBlog: [

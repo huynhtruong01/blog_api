@@ -58,7 +58,7 @@ const StoryController = {
                 return res.status(404).json({ message: 'Not found this story' })
             }
 
-            res.status(200).json({ story, message: 'Get by id story successfully' })
+            res.status(200).json({ data: story })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Get by id story failed' })
         }
@@ -116,8 +116,8 @@ const StoryController = {
                     },
                 },
                 { $sort: { createdAt: -1 } },
-                { $limit: limit },
                 { $skip: skip },
+                { $limit: limit },
             ])
 
             const count = await Story.aggregate([
@@ -133,12 +133,40 @@ const StoryController = {
 
             const totalCount = Math.ceil(count[0]?.['count'] / limit) || 0
 
-            console.log(data, totalCount)
+            // console.log(data.length, count)
+            // console.log(data, totalCount)
 
             res.status(200).json({ data, totalCount })
         } catch (error) {
             console.log(error.message)
             res.status(500).json({ error: error.message, message: 'Search name story failed' })
+        }
+    },
+    // add url social
+    addUrlSocial: async (req, res) => {
+        try {
+            const story = await Story.findById({ _id: req.params.id })
+            if (!story) {
+                return res.status(404).json({ message: 'Not found this story' })
+            }
+
+            await Story.findByIdAndUpdate(
+                { _id: req.params.id },
+                {
+                    $set: {
+                        $push: {
+                            urlSocial: req.body.urlSocial,
+                        },
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+
+            res.status(200).json({ message: 'Add url social successfully' })
+        } catch (error) {
+            res.status(500).json({ error: error.message, message: 'Add url social failed' })
         }
     },
 }

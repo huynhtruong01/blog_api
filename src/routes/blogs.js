@@ -3,6 +3,7 @@ const BlogController = require('../controllers/BlogController')
 const router = express.Router()
 
 router.get('/', BlogController.getAllBlog)
+router.get('/:id', BlogController.getByIdBlog)
 router.post('/', BlogController.addBlog)
 router.post('/by-user', BlogController.getBlogByUser)
 router.post('/by-category', BlogController.getBlogByCategory)

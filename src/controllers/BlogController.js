@@ -7,6 +7,7 @@ const BlogController = {
     // create blog
     addBlog: async (req, res) => {
         try {
+            console.log(req.body)
             const newBlog = new Blog({
                 ...req.body,
             })

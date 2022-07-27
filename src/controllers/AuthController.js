@@ -9,7 +9,7 @@ const { sendEmail } = require('../config/sendMail')
 const { validateEmail, validPhone } = require('../middleware/isValid')
 const { sendSms } = require('../config/sendSMS')
 const jwt = require('jsonwebtoken')
-const { json } = require('express')
+const { hashPassword } = require('../utils/hashPassword')
 
 const AuthController = {
     // register
@@ -93,7 +93,7 @@ const AuthController = {
     login: async (req, res) => {
         try {
             // check email
-            const user = await User.findOne({ email: req.body.email })
+            const user = await User.findOne({ email: req.body.email }).populate('role')
             if (!user) {
                 return res
                     .status(404)
@@ -133,7 +133,7 @@ const AuthController = {
         try {
             res.clearCookie('refreshToken', { path: '/api/auth/refresh-token' })
             await User.findByIdAndUpdate(
-                { _id: req.body.id },
+                { _id: req.body._id },
                 {
                     $set: {
                         rf_token: '',
@@ -179,7 +179,7 @@ const AuthController = {
             const accessToken = generateAccessToken({ _id: user._id })
             const refreshToken = generateRefreshToken({ _id: user._id }, res)
 
-            await User.findByIdAndUpdate(
+            const newUser = await User.findByIdAndUpdate(
                 { _id: user._id },
                 {
                     $set: {
@@ -191,9 +191,73 @@ const AuthController = {
                 }
             )
 
-            res.status(200).json({ accessToken })
+            res.status(200).json({ user: newUser, accessToken })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Khởi tạo token thất bại' })
+        }
+    },
+    // verify email dashboard
+    verifyEmailDashboard: async (req, res) => {
+        try {
+            const user = await User.findOne({ email: req.body.email })
+
+            if (!user) {
+                return res.status(404).json({
+                    message: 'Not found this user by email or phone number. Please create account',
+                })
+            }
+
+            res.status(200).json({ message: 'Verify email successfully' })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                message: 'Error when verify email',
+            })
+        }
+    },
+    // verify email client
+    verifyEmailClient: async (req, res) => {
+        try {
+            const user = await User.findOne({ email: req.body.email })
+            if (!user) {
+                return res.status(404).json({
+                    message:
+                        'Không tìm thấy tài khoản của bạn. Vui lòng tạo tài khoản để đăng nhập vào trang',
+                })
+            }
+
+            res.json(200).json({ message: 'Xác nhận email hoặc số điện thoại thành công' })
+        } catch (error) {
+            res.status(500).json({
+                error: error.message,
+                message: 'Đã có lỗi trong việc xác nhân email hoặc số điện thoại',
+            })
+        }
+    },
+    // forgot password
+    forgotPassword: async (req, res) => {
+        try {
+            const user = await User.findOne({ email: req.body.email })
+            if (!user) {
+                return res.status(404).json({ message: 'Not found user. Please create account' })
+            }
+
+            const password = await hashPassword(req.body.password)
+            await User.findOneAndUpdate(
+                { email: req.body.email },
+                {
+                    $set: {
+                        password,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+
+            res.status(200).json({ message: 'Reset password successfully' })
+        } catch (error) {
+            res.status(500).json({ error: error.message, message: 'Reset password failed' })
         }
     },
 }
