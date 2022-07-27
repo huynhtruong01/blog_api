@@ -25,7 +25,7 @@ app.get('/', async (req, res) => {
     res.json({
         message: 'Welcome to Athetics Huynh Blog',
         'stories-api': 'https://athetics-blog-app.herokuapp.com/api/stories',
-        'blogs-api': 'https://athetics-blog-app.herokuapp.com/api/stories',
+        'blogs-api': 'https://athetics-blog-app.herokuapp.com/api/blogs',
     })
 })
 
