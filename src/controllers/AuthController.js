@@ -7,9 +7,9 @@ const {
 } = require('../config/generateToken')
 const { sendEmail } = require('../config/sendMail')
 const { validateEmail, validPhone } = require('../middleware/isValid')
-const { sendSms } = require('../config/sendSMS')
 const jwt = require('jsonwebtoken')
 const { hashPassword } = require('../utils/hashPassword')
+const { sendSms } = require('../config/sendSms')
 
 const AuthController = {
     // register
