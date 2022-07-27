@@ -1,5 +1,5 @@
 const express = require('express')
-const StoryController = require('../controllers/storyController')
+const StoryController = require('../controllers/StoryController')
 const router = express.Router()
 
 router.get('/', StoryController.getAllStory)
