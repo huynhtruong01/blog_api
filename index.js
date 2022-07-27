@@ -21,7 +21,7 @@ connectData()
 
 // routes
 app.use('/api', routes)
-app.get('/', async (req, res) => {
+app.get('/', (req, res) => {
     res.json({
         message: 'Welcome to Athetics Huynh Blog',
         'stories-api': 'https://athetics-blog-app.herokuapp.com/api/stories',
