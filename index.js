@@ -21,6 +21,13 @@ connectData()
 
 // routes
 app.use('/api', routes)
+app.get('/', async (req, res) => {
+    res.json({
+        message: 'Welcome to Athetics Huynh Blog',
+        'stories-api': 'https://athetics-blog-app.herokuapp.com/api/stories',
+        'blogs-api': 'https://athetics-blog-app.herokuapp.com/api/stories',
+    })
+})
 
 const port = process.env.PORT || 5500
 app.listen(port, () => console.log(`Server is running port ${port}`))
