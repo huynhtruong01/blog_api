@@ -598,6 +598,32 @@ const UserController = {
             })
         }
     },
+    // add website url
+    addWebsiteUrl: async (req, res) => {
+        try {
+            const user = await User.findById({ _id: req.params })
+
+            if (!user) {
+                return res.status(404).json({ message: 'Không tìm thấy tài khoản của bạn' })
+            }
+
+            await User.findByIdAndUpdate(
+                { _id: req.params },
+                {
+                    $push: {
+                        websiteUrl: req.body.websiteUrl,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+
+            res.status(200).json({ message: 'Add website url successfully' })
+        } catch (error) {
+            res.status(500).json({ error: error.message, error: 'Add website url failed' })
+        }
+    },
 }
 
 module.exports = UserController

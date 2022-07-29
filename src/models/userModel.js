@@ -17,11 +17,13 @@ const user = new mongoose.Schema(
             trim: true,
             default: '',
         },
-        website: {
-            type: String,
-            trim: true,
-            default: '',
-        },
+        website: [
+            {
+                type: String,
+                trim: true,
+                default: '',
+            },
+        ],
         avatar: {
             type: String,
             default: 'http://cdn.onlinewebfonts.com/svg/img_569204.png',
