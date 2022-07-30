@@ -85,6 +85,7 @@ const BlogController = {
     // get by id blog
     getByIdBlog: async (req, res) => {
         try {
+            console.log(req.params.id)
             const blog = await Blog.findById({ _id: req.params.id })
                 .populate({
                     path: 'user',
