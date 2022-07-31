@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const routerCommon = require('./common')
 const routerStories = require('./stories')
 const routerAuth = require('./auth')
 const routerUsers = require('./users')
@@ -8,6 +9,7 @@ const routerBlogs = require('./blogs')
 const routerRoles = require('./roles')
 
 const routes = [
+    router.use('/common', routerCommon),
     router.use('/stories', routerStories),
     router.use('/auth', routerAuth),
     router.use('/users', routerUsers),
