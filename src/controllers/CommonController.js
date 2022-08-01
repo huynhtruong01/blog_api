@@ -96,11 +96,11 @@ const CommonController = {
         try {
             const blogs = await Blog.find()
 
-            const newBlogs = blogs._doc
+            const newBlogs = blogs
                 .map((blog) => ({ ...blog, likes: blog.likes.length }))
                 .sort((a, b) => a - b)
 
-            res.status(200).json({ data: newBlogs })
+            res.status(200).json({ data: newBlogs._doc })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Get blog list top failed' })
         }
