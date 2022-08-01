@@ -1,5 +1,5 @@
 // ====================== Date ===========================
-export const getMonthText = (time) => {
+const getMonthText = (time) => {
     const monthList = [
         'jan',
         'feb',
@@ -19,12 +19,14 @@ export const getMonthText = (time) => {
     return monthList[month]
 }
 
-export const getYearText = (time) => {
+const getYearText = (time) => {
     const year = `y${new Date(time).getFullYear()}`
     return year
 }
 
-export const getYear = (time) => {
+const getYear = (time) => {
     const year = new Date(time).getFullYear()
     return year
 }
+
+module.exports = { getMonthText, getYearText, getYear }
