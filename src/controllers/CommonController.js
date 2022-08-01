@@ -96,8 +96,11 @@ const CommonController = {
         try {
             const blogs = await Blog.find()
 
-            const newBlogs = blogs
-                .map((blog) => ({ ...blog, likes: blog.likes.length }))
+            const newBlogs = [...blogs]
+                .map((blog) => {
+                    const newBlog = blog._doc
+                    return { ...newBlog, likes: newBlog.likes.length }
+                })
                 .sort((a, b) => a - b)
 
             res.status(200).json({ data: newBlogs })
