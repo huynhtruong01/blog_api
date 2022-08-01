@@ -96,7 +96,7 @@ const CommonController = {
         try {
             const blogs = await Blog.find()
 
-            const newBlogs = blogs
+            const newBlogs = blogs._doc
                 .map((blog) => ({ ...blog, likes: blog.likes.length }))
                 .sort((a, b) => a - b)
 
