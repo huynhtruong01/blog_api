@@ -92,6 +92,19 @@ const CommonController = {
             res.status(500).json({ error: error.message, message: 'Get total data blog failed' })
         }
     },
+    topLikeBlog: async (req, res) => {
+        try {
+            const blogs = await Blog.find()
+
+            const newBlogs = blogs
+                .map((blog) => ({ ...blog, likes: blog.likes.length }))
+                .sort((a, b) => a - b)
+
+            res.status(200).json({ data: newBlogs })
+        } catch (error) {
+            res.status(500).json({ error: error.message, message: 'Get blog list top failed' })
+        }
+    },
 }
 
 module.exports = CommonController
