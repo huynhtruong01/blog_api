@@ -62,6 +62,10 @@ const user = new mongoose.Schema(
                 ref: 'User',
             },
         ],
+        isActive: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         timestamps: true,

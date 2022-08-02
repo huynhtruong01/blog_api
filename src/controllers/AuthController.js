@@ -116,6 +116,7 @@ const AuthController = {
                 {
                     $set: {
                         rf_token: refreshToken,
+                        isActive: true,
                     },
                 },
                 {
@@ -137,6 +138,7 @@ const AuthController = {
                 {
                     $set: {
                         rf_token: '',
+                        isActive: false,
                     },
                 },
                 {
