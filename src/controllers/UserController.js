@@ -89,7 +89,9 @@ const UserController = {
     // get by id
     getByIdUser: async (req, res) => {
         try {
-            const user = await User.findById({ _id: req.params.id }).select('-password')
+            const user = await User.findById({ _id: req.params.id })
+                .select('-password')
+                .populate('role')
             if (!user) {
                 return res.status(404).json({ message: 'Not found this user' })
             }
