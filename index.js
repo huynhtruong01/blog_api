@@ -13,7 +13,14 @@ dotenv.config().parsed
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(morgan('common'))
-app.use(cors())
+app.use(
+    cors({
+        origin: 'http://localhost:3000',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
+        optionsSuccessStatus: 200,
+    })
+)
 app.use(cookieParser())
 
 // connect db

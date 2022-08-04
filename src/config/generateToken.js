@@ -13,7 +13,7 @@ const generateRefreshToken = (payload, res) => {
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         path: '/api/auth/refresh-token',
-        maxAge: 30 * 24 * 60 * 60 * 1000, //30d
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30d
     })
 
     return refreshToken

@@ -154,7 +154,7 @@ const AuthController = {
     // refresh token
     refreshToken: async (req, res) => {
         try {
-            const getRefreshToken = req.cookies.refreshToken
+            const getRefreshToken = req.cookies['refreshToken']
             // has token?
             if (!getRefreshToken) {
                 return res.status(404).json({ message: 'Vui lòng đăng nhập tài khoản' })
@@ -168,6 +168,8 @@ const AuthController = {
             const user = await User.findById({ _id: isValidToken._id }).select(
                 '+rf_token -password'
             )
+
+            console.log(user)
             if (!user) {
                 return res.status(404).json({
                     message: 'Không tìm thấy người dùng này. Vui lòng đăng ký để đăng nhập',
@@ -191,7 +193,7 @@ const AuthController = {
                 {
                     new: true,
                 }
-            )
+            ).populate('role')
 
             res.status(200).json({
                 user: newUser,
