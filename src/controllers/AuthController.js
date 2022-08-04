@@ -193,7 +193,11 @@ const AuthController = {
                 }
             )
 
-            res.status(200).json({ user: newUser, accessToken })
+            res.status(200).json({
+                user: newUser,
+                accessToken,
+                message: 'Đăng nhập thành công',
+            })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Khởi tạo token thất bại' })
         }
