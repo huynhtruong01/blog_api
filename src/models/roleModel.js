@@ -8,6 +8,12 @@ const role = new mongoose.Schema(
             lowercase: true,
             trim: true,
         },
+        description: {
+            type: String,
+            required: true,
+            lowercase: true,
+            trim: true,
+        },
         userList: [
             {
                 type: mongoose.Types.ObjectId,

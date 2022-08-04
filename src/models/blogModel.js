@@ -15,7 +15,7 @@ const blog = new mongoose.Schema(
         description: {
             type: String,
             required: true,
-            minLength: 100,
+            minLength: 80,
             trim: true,
         },
         thumbnail: {
@@ -25,7 +25,7 @@ const blog = new mongoose.Schema(
         content: {
             type: String,
             required: true,
-            minLength: 100,
+            minLength: 1000,
         },
         category: {
             type: mongoose.Types.ObjectId,

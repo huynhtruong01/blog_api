@@ -1,4 +1,5 @@
 const Blog = require('../models/blogModel')
+const Category = require('../models/categoryModel')
 const User = require('../models/userModel')
 const ApiFeatures = require('../utils/apiFeatures')
 const pagination = require('../utils/pagination')
@@ -12,9 +13,25 @@ const BlogController = {
                 ...req.body,
             })
 
-            await newBlog.save()
+            const category = await Category.findById({ _id: req.body.category })
+            if (!category) {
+                return res.status(404).json({ message: 'Not found this category' })
+            }
 
-            res.status(200).json({ blog: newBlog, message: 'Add blog successfully' })
+            const blog = await newBlog.save()
+
+            await Category.findByIdAndUpdate(
+                { _id: req.body.category },
+                {
+                    $push: {
+                        blogList: blog?._id,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
+            res.status(200).json({ blog, message: 'Add blog successfully' })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Add blog failed' })
         }
@@ -244,6 +261,25 @@ const BlogController = {
             if (!blog) {
                 return res.status(404).json({ message: 'Not found this blog' })
             }
+
+            const category = await Category.findById({ _id: blog.category })
+            if (!category) {
+                return res.status(404).json({ message: 'Not found this category' })
+            }
+
+            console.log(category)
+
+            await Category.findByIdAndUpdate(
+                { _id: category._id },
+                {
+                    $pull: {
+                        blogList: blog._id,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
 
             await Blog.findByIdAndDelete({ _id: req.params.id })
 

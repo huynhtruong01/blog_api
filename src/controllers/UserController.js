@@ -1,4 +1,5 @@
 const Blog = require('../models/blogModel')
+const Role = require('../models/roleModel')
 const User = require('../models/userModel')
 const { hashPassword } = require('../utils/hashPassword')
 const pagination = require('../utils/pagination')
@@ -14,12 +15,28 @@ const UserController = {
 
             const password = await hashPassword(req.body.password)
 
-            const user = new User({
+            const newUser = new User({
                 ...req.body,
                 password,
             })
 
-            await user.save()
+            const role = await Role.findById({ _id: req.body.role })
+            if (!role) {
+                return res.status(404).json({ message: 'Not found this role' })
+            }
+            const user = await newUser.save()
+
+            await Role.findByIdAndUpdate(
+                { _id: req.body.role },
+                {
+                    $push: {
+                        userList: user?._id,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
 
             res.status(200).json({ user, message: 'Create user successfully' })
         } catch (error) {
@@ -250,6 +267,23 @@ const UserController = {
                     }
                 )
             }
+
+            const role = await Role.findById({ _id: user.role })
+            if (!role) {
+                return res.status(404).json({ message: 'Not found this role' })
+            }
+
+            await Role.findByIdAndUpdate(
+                { _id: role?._id },
+                {
+                    $pull: {
+                        userList: user?._id,
+                    },
+                },
+                {
+                    new: true,
+                }
+            )
 
             res.status(200).json({ message: 'Delete user successfully' })
         } catch (error) {

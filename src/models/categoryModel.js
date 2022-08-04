@@ -13,6 +13,12 @@ const category = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        blogList: [
+            {
+                type: mongoose.Types.ObjectId,
+                ref: 'Blog',
+            },
+        ],
     },
     {
         timestamps: true,
