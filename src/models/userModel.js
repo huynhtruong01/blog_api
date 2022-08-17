@@ -42,6 +42,7 @@ const user = new mongoose.Schema(
             type: mongoose.Types.ObjectId,
             ref: 'Role',
             required: true,
+            default: '62ebefbbad8d1d9b40a3ef72',
         },
         rf_token: { type: String, select: false },
         savedBlog: [
@@ -64,8 +65,8 @@ const user = new mongoose.Schema(
         ],
         isActive: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     {
         timestamps: true,
