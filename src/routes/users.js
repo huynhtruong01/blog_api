@@ -13,5 +13,6 @@ router.post('/unfollow', UserController.unfollowUser)
 router.get('/get-all-follower/:id', UserController.getAllFollower)
 router.get('/get-all-following/:id', UserController.getAllFollowing)
 router.put('/add-website-url/:id', UserController.addWebsiteUrl)
+router.put('/delete-website-url/:id', UserController.removeWebsiteUrl)
 
 module.exports = router
