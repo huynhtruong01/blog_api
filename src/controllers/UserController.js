@@ -188,7 +188,7 @@ const UserController = {
                 ? await hashPassword(req.body.password)
                 : user.password
 
-            await User.findByIdAndUpdate(
+            const newUser = await User.findByIdAndUpdate(
                 { _id: user._id },
                 {
                     $set: {
@@ -199,7 +199,7 @@ const UserController = {
                 { new: true }
             )
 
-            res.status(200).json({ message: 'Update user successfully' })
+            res.status(200).json({ data: newUser, message: 'Update user successfully' })
         } catch (error) {
             res.status(500).json({ error: error.message, message: 'Update user failed' })
         }
