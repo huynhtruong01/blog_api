@@ -7,6 +7,7 @@ const routerUsers = require('./users')
 const routerCategories = require('./categories')
 const routerBlogs = require('./blogs')
 const routerRoles = require('./roles')
+const routerSaveBlog = require('./saveBlog')
 
 const routes = [
     router.use('/common', routerCommon),
@@ -16,6 +17,7 @@ const routes = [
     router.use('/categories', routerCategories),
     router.use('/blogs', routerBlogs),
     router.use('/roles', routerRoles),
+    router.use('/save-blog', routerSaveBlog),
 ]
 
 module.exports = routes

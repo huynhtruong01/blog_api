@@ -13,6 +13,5 @@ router.post('/like-blog', BlogController.likeBlog)
 router.post('/unlike-blog', BlogController.unlikeBlog)
 router.post('/save-blog', BlogController.savedBlog)
 router.post('/unsave-blog', BlogController.unsavedBlog)
-router.get('/get-save-blog', BlogController.getAllSavedBlog)
 
 module.exports = router
