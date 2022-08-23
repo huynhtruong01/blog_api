@@ -42,14 +42,12 @@ const story = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
-            lowercase: true,
         },
         description: {
             type: String,
             required: true,
             minLength: 100,
             trim: true,
-            lowercase: true,
         },
         content: {
             type: String,
