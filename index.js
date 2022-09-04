@@ -15,7 +15,11 @@ app.use(express.urlencoded({ extended: false }))
 app.use(morgan('common'))
 app.use(
     cors({
-        origin: ['http://localhost:3000', 'https://blog-dashboard-dusky.vercel.app'],
+        origin: [
+            'http://localhost:3000',
+            'https://blog-dashboard-dusky.vercel.app',
+            'https://blog-project-ruby.vercel.app',
+        ],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
         optionsSuccessStatus: 200,
