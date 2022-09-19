@@ -8,6 +8,7 @@ const routerCategories = require('./categories')
 const routerBlogs = require('./blogs')
 const routerRoles = require('./roles')
 const routerSaveBlog = require('./saveBlog')
+const routerComment = require('./comments')
 
 const routes = [
     router.use('/common', routerCommon),
@@ -18,6 +19,7 @@ const routes = [
     router.use('/blogs', routerBlogs),
     router.use('/roles', routerRoles),
     router.use('/save-blog', routerSaveBlog),
+    router.use('/comment', routerComment),
 ]
 
 module.exports = routes
